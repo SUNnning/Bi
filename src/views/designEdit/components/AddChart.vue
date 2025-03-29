@@ -7,11 +7,10 @@ const props = defineProps({
   dashboardData: {
     type: Object,
     required: true
-  },
-  scaleRate: { type: Number, default: 50 }
+  }
 })
 
-const emit = defineEmits(['update:dashboardData', 'showAddModal', 'generate', 'generateImg', 'shapeGenerate', 'changeRito', 'scaleRateAdd', 'update:scaleRate'])
+const emit = defineEmits(['update:dashboardData', 'showAddModal', 'generate', 'generateImg', 'shapeGenerate'])
 
 const dataShadow = ref({})
 
@@ -47,7 +46,7 @@ const updateDashboardData = () => {
 
 const scaleRateAdd = (type) => {
   if (type === 'min') {
-    dataShadow.value.scaleRate = Math.max(dataShadow.value.scaleRate - 1, 10)
+    dataShadow.value.scaleRate = Math.max(dataShadow.value.scaleRate - 1, 25)
   }
   if (type === 'add') {
     dataShadow.value.scaleRate = Math.min(dataShadow.value.scaleRate + 1, 100)
@@ -91,7 +90,7 @@ const scaleRateAdd = (type) => {
     <div style="width:147px; height: 42px;" class="dis-flex">
       <div style="font-size: 12px;color: rgba(255, 255, 255, 0.75);">{{ dataShadow.scaleRate }}%</div>
       <MinusCircleTwoTone @click="scaleRateAdd('min')"/>
-      <a-slider v-model:value="dataShadow.scaleRate" @change="updateDashboardData" :min="10" :max="100" style="width: 72px;"/>
+      <a-slider v-model:value="dataShadow.scaleRate" @change="updateDashboardData" :min="25" :max="100" style="width: 72px;"/>
       <PlusCircleTwoTone @click="scaleRateAdd('add')"/>
     </div>
   </div>

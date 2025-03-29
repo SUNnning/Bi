@@ -26,7 +26,6 @@ fetchEditData().then(res => {
 <style lang="less" scoped>
 .design-wrapper {
   height: calc(100vh - 50px);
-  background: gold;
   display: flex;
   justify-content: space-between;
 }

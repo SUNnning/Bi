@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, watchEffect, toRef } from 'vue'
 import AddChart from './AddChart.vue'
+import Painter from './Painter.vue'
 const props = defineProps({
   dashboardData: {
     type: Object,
@@ -27,6 +28,7 @@ watch(dataShadow, (newVal) => {
 <template>
   <div class="header-wrapper">
     <AddChart v-model:dashboardData="dataShadow"/>
+    <Painter v-model:dashboardData="dataShadow" class="painter-wrapper"/>
   </div>
 </template>
 
@@ -34,6 +36,9 @@ watch(dataShadow, (newVal) => {
 .header-wrapper {
   flex: 1;
   height: calc(100vh - 50px);
-  background: #f79503;
+  background: rgba(22, 27, 33, 0.7);
+  .painter-wrapper {
+    height: calc(100% - 42px);
+  }
 }
 </style>
