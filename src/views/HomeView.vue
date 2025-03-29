@@ -1,5 +1,5 @@
 <script setup>
-import DesignEdit from './designEdit/index.vue'
+import DesignEdit from './designEdit/DesignEditView.vue'
 </script>
 
 <template>

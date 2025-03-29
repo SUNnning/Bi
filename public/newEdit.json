@@ -1,0 +1,29 @@
+{
+  "data": {
+    "status": "success",
+    "timestamp": "2023-01-01T00:00:00Z",
+    "id": "001",
+    "title": "Create New Edit",
+    "name": "newEdit",
+    "description": "Create a new edit for a given file in the repository.",
+    "scaleRate": 40,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "filePath": {
+          "type": "string",
+          "description": "The path to the file in the repository."
+        },
+        "editContent": {
+          "type": "string",
+          "description": "The content to be added to the file."
+        },
+        "commitMessage": {
+          "type": "string",
+          "description": "The commit message for the new edit."
+        }
+      },
+      "required": ["filePath", "editContent", "commitMessage"]
+    }
+  }
+}
