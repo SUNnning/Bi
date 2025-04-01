@@ -16,6 +16,7 @@ fetchEditData().then(res => {
 </script>
 
 <template>
+  <div class="design-header">header</div>
   <div class="design-wrapper">
     <TreeLayer v-model:dashboardData="dashboardData"/>
     <WorkPlace v-model:dashboardData="dashboardData"/>
@@ -24,8 +25,11 @@ fetchEditData().then(res => {
 </template>
 
 <style lang="less" scoped>
+.design-header {
+  height: 50px;
+}
 .design-wrapper {
-  height: calc(100vh - 50px);
+  height: calc(100vh - 100px);
   display: flex;
   justify-content: space-between;
 }

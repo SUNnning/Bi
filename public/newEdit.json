@@ -6,6 +6,28 @@
     "title": "Create New Edit",
     "name": "newEdit",
     "description": "Create a new edit for a given file in the repository.",
-    "scaleRate": 40
+    "scaleRate": 40,
+    "layout": [
+      {
+        "id":"dd213762-d08f-44ba-add6-5285b28cdafd",
+        "key":"0-0",
+        "isLock":false,
+        "isShow":true,
+        "canvas":{"w":400,"h":200,"x":336,"y":350},
+        "chartType":306,
+        "title":"内嵌",
+        "json":{"isFull":false,"src":""}
+      },
+      {
+        "id":"9306985c-3886-4b56-a207-ac29545def69",
+        "key":"0-1",
+        "isLock":false,
+        "isShow":true,
+        "canvas":{"w":400,"h":200,"x":322,"y":90},
+        "chartType":303,
+        "title":"视频",
+        "json":{"rgbColor":{"rgba":{"r":0,"g":0,"b":0,"a":0}},"opacity":100,"videoUrl":"","loop":true,"muted":true,"autoplay":true,"sizeType":""}
+      }
+    ]
   }
 }

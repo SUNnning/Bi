@@ -35,7 +35,7 @@ watch(dataShadow, (newVal) => {
 <style lang="less" scoped>
 .header-wrapper {
   flex: 1;
-  height: calc(100vh - 50px);
+  height: 100%;
   background: rgba(22, 27, 33, 0.7);
   .painter-wrapper {
     height: calc(100% - 42px);

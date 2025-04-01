@@ -1,5 +1,6 @@
 <script setup>
 import { ref, toRef, watchEffect, computed, onMounted, onUnmounted } from 'vue'
+import PainterDragNode from './PainterDragNode.vue'
 
 const props = defineProps({
   dashboardData: {
@@ -25,6 +26,17 @@ const cloneLayoutAllShadow = ref([])
 const coefficient = computed(() => {
   return (dataShadow.value.scaleRate / 100)
 })
+
+const updateNode = node => {
+  dataShadow.value.layout.forEach((e, i) => {
+    if (e.i === node.i) {
+      dataShadow.value.layout[i] = node
+    }
+  })
+  updateDashboardData()
+}
+
+// 监听鼠标拖动
 const lastMouseX =ref(0)
 const lastMouseY =ref(0)
 const mouseX = ref(0)
@@ -35,12 +47,10 @@ const boardOffsetY = ref(0)
 const spaceBarFlag = ref(false)
 const dragBoardMouseDown = e => {
   if (spaceBarFlag.value) {
-    // if (e.target === e.currentTarget) {
-      // 记录鼠标按下时的坐标
-      lastMouseX.value = e.clientX
-      lastMouseY.value = e.clientY
-      isMouseDown.value = true
-    // }
+    // 记录鼠标按下时的坐标
+    lastMouseX.value = e.clientX
+    lastMouseY.value = e.clientY
+    isMouseDown.value = true
   }
 }
 const dragBoardMouseMove = e => {
@@ -61,7 +71,6 @@ const dragBoardMouseMove = e => {
 const dragBoardMouseUp  = () => {
   // 鼠标松开时重置标志位
   isMouseDown.value = false
-  // mouseX = event.clientX
 }
 const handleWheel = e => {
   if (keydownList.value.includes('ctrlDown')) {
@@ -97,12 +106,8 @@ onUnmounted(() => {
 <template>
   <div class="con-drag">
     <div
-      :style="{
-        top: `calc(50% + ${boardOffsetY}px)`,
-        left: `calc(50% + ${boardOffsetX}px)`,
-        transform: `translate(-50%, -50%) scale(${coefficient}, ${coefficient})`
-      }"
       class="scal-board"
+      :style="{ top: `calc(50% + ${boardOffsetY}px)`, left: `calc(50% + ${boardOffsetX}px)`, transform: `translate(-50%, -50%) scale(${coefficient}, ${coefficient})` }"
       @wheel.prevent="handleWheel"
     >
       <div
@@ -114,40 +119,14 @@ onUnmounted(() => {
         @click.self="paintAreaClick"
       >
         <div class="center-boar" @click="paintAreaClick"></div>
-        <!-- :z="(activeCount === 1 && item.active) ? 9999 : 1000 - index" -->
-        <vue-draggable-resizable
-          v-for="(item, index) in cloneLayoutAllShadow"
-          :class-name="item.chartType === 301 ? 'reset-item-class-text' : 'reset-item-class'"
-          :key="item.key"
-          :id="item.i" 
-          :x="item.x" 
-          :y="item.y" 
-          :w="item.w"
-          :h="item.h"
-          :z="1000 - index"
-          :active="item.active"
-          :parent="true"
-          :preventActiveBehavior="true"
-          :scaleRatio="scalRatio"
-          :resizable="resizable"
-          :disableUserSelect="true"
-          :draggable="!spaceBarFlag"
-          @activated="() => clickedEv(index, item)"
-          @resizing="resizing"
-          @resizestop="(x, y, width, height) => onRresizeStop(x, y, width, height, item)" 
-          @dragging="(x, y) => dragging(x, y, item)"
-          @dragstop="(x, y) => dragstop(x, y, item)"
-        >
-          <div
-            @click="gridItemClick(item)"
-            @dblclick="dblclickEv(index, item)"
-            @contextmenu.prevent="showContextMenu($event, item)"
-            style="height: 100%"
-            :class="item.active && !uniqueGroup ? 'checked' : (item.layer !== currentSelectLayer ? 'inner-item' : '')"
-          >
-            test
-          </div>
-        </vue-draggable-resizable>
+        <PainterDragNode
+          v-for="(node, index) in dataShadow.layout"
+          :key="index"
+          :layerIndex="index"
+          :scaleRatio="dataShadow.scaleRate"
+          v-bind="node"
+          @updateNode="updateNode"
+        />
       </div>
     </div>
   </div>
