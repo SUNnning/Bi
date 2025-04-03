@@ -24,6 +24,9 @@ const list = [
 .wrapper {
   height: 100%;
   width: 200px;
+  flex-shrink: 0;
   background: #9599a3;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
 }
 </style>

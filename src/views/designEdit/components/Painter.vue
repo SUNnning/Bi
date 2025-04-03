@@ -17,7 +17,6 @@ watchEffect(() => {
   dataShadow.value = propsData.value
 })
 const updateDashboardData = () => {
-  console.log('updateDashboardData', dataShadow.value)
   emit('update:dashboardData', dataShadow.value)
 }
 
@@ -32,70 +31,99 @@ const updateNode = node => {
   updateDashboardData()
 }
 
-// 监听鼠标拖动
-const lastMouseX =ref(0)
-const lastMouseY =ref(0)
-const mouseX = ref(0)
-const mouseY = ref(0)
-const isMouseDown = ref(false)
-const boardOffsetX = ref(0)
-const boardOffsetY = ref(0)
-const spaceBarFlag = ref(false)
-const dragBoardMouseDown = e => {
-  if (spaceBarFlag.value) {
-    // 记录鼠标按下时的坐标
-    lastMouseX.value = e.clientX
-    lastMouseY.value = e.clientY
-    isMouseDown.value = true
-  }
-}
-const dragBoardMouseMove = e => {
-  // 只有在鼠标按下时才计算位移
-  if (isMouseDown.value) {
-    // 获取当前鼠标坐标
-    mouseX.value = e.clientX
-    mouseY.value = e.clientY
-    // 计算鼠标位移
-    const deltaX = mouseX.value - lastMouseX.value
-    const deltaY = mouseY.value - lastMouseY.value
-    boardOffsetX.value += deltaX
-    boardOffsetY.value += deltaY
-    lastMouseX.value = e.clientX
-    lastMouseY.value = e.clientY
-  }
-}
-const dragBoardMouseUp  = () => {
-  // 鼠标松开时重置标志位
-  isMouseDown.value = false
-}
-const handleWheel = e => {
-  if (keydownList.value.includes('ctrlDown')) {
-    if (e.deltaY < 0) dataShadow.value.scaleRate = Math.min(dataShadow.value.scaleRate + 1, 100)
-    if (e.deltaY > 0) dataShadow.value.scaleRate = Math.max(dataShadow.value.scaleRate - 1, 25)
-    updateDashboardData()
-  }
-}
-const keydownList = ref([])
-const keydownFoo = ev => {
-  if (ev.keyCode === 16) keydownList.value.push('shiftDown') // shift
-  if (ev.keyCode === 17) keydownList.value.push('ctrlDown') // ctrl
-  if (ev.keyCode === 32) spaceBarFlag.value = true // spacebar
-}
-const keyupFoo = ev => {
-  console.log(ev, 'key')
-  if (ev.keyCode === 16) keydownList.value = keydownList.value.filter(item => item !== 'shiftDown')
-  if (ev.keyCode === 17) keydownList.value = keydownList.value.filter(item => item !== 'ctrlDown')
-  if (ev.keyCode === 32) spaceBarFlag.value = false
+// 画布拖动状态
+const dragState = ref({
+  isMouseDown: false,
+  startX: 0,
+  startY: 0,
+  offsetX: 0,
+  offsetY: 0,
+  spaceBarPressed: false
+})
+
+// 按键状态
+const keyState = ref({
+  ctrl: false,
+  shift: false,
+  space: false
+})
+
+// 画布拖动处理
+const handleMouseDown = (e) => {
+  if (!dragState.value.spaceBarPressed) return
+  
+  dragState.value.isMouseDown = true
+  dragState.value.startX = e.clientX - dragState.value.offsetX
+  dragState.value.startY = e.clientY - dragState.value.offsetY
 }
 
+const handleMouseMove = (e) => {
+  if (!dragState.value.isMouseDown) return
+  
+  dragState.value.offsetX = e.clientX - dragState.value.startX
+  dragState.value.offsetY = e.clientY - dragState.value.startY
+}
+
+const handleMouseUp = () => {
+  dragState.value.isMouseDown = false
+}
+
+// 缩放处理
+const handleWheel = (e) => {
+  if (!keyState.value.ctrl) return
+  
+  const delta = e.deltaY < 0 ? 1 : -1
+  dataShadow.value.scaleRate = Math.min(
+    Math.max(
+      dataShadow.value.scaleRate + delta,
+      25
+    ),
+    100
+  )
+  updateDashboardData()
+}
+
+// 键盘事件处理
+const handleKeyDown = (e) => {
+  switch(e.keyCode) {
+    case 16: // Shift
+      keyState.value.shift = true
+      break
+    case 17: // Ctrl
+      keyState.value.ctrl = true
+      break
+    case 32: // Space
+      e.preventDefault() // 防止页面滚动
+      keyState.value.space = true
+      dragState.value.spaceBarPressed = true
+      break
+  }
+}
+
+const handleKeyUp = (e) => {
+  switch(e.keyCode) {
+    case 16:
+      keyState.value.shift = false
+      break
+    case 17:
+      keyState.value.ctrl = false
+      break
+    case 32:
+      keyState.value.space = false
+      dragState.value.spaceBarPressed = false
+      break
+  }
+}
+
+// 生命周期钩子
 onMounted(() => {
-  window.addEventListener('keydown', keydownFoo)
-  window.addEventListener('keyup', keyupFoo)
+  window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('keyup', handleKeyUp)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', keydownFoo)
-  window.removeEventListener('keyup', keyupFoo)
+  window.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('keyup', handleKeyUp)
 })
 </script>
 
@@ -104,18 +132,18 @@ onUnmounted(() => {
     <div
       class="scal-board"
       :style="{
-        top: `calc(50% + ${boardOffsetY}px)`,
-        left: `calc(50% + ${boardOffsetX}px)`,
+        top: `calc(50% + ${dragState.offsetY}px)`,
+        left: `calc(50% + ${dragState.offsetX}px)`,
         transform: `translate(-50%, -50%) scale(${coefficient}, ${coefficient})`,
-        cursor: spaceBarFlag ? (isMouseDown ? 'grabbing' : 'grab') : '',
-        cursor: spaceBarFlag ? (isMouseDown ? '-webkit-grabbing' : '-webkit-grab') : ''
+        cursor: dragState.spaceBarPressed ? (dragState.isMouseDown ? 'grabbing' : 'grab') : 'default'
       }"
       @wheel.prevent="handleWheel"
-      @mousedown="dragBoardMouseDown"
-      @mousemove="dragBoardMouseMove"
-      @mouseup="dragBoardMouseUp"
-      >
-      <div class="center-boar" @click="paintAreaClick">
+      @mousedown="handleMouseDown"
+      @mousemove="handleMouseMove"
+      @mouseup="handleMouseUp"
+      @mouseleave="handleMouseUp"
+    >
+      <div class="center-boar">
         <PainterDragNode
           v-for="(node, index) in dataShadow.layout"
           :key="index"

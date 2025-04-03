@@ -11,6 +11,7 @@
 .wrapper {
   height: 100%;
   width: 200px;
+  flex-shrink: 0;
   background: #383d41;
   color: #Fff
 }
