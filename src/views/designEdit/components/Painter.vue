@@ -6,8 +6,7 @@ const props = defineProps({
   dashboardData: {
     type: Object,
     required: true
-  },
-  scaleRate: { type: Number, default: 50 }
+  }
 })
 
 const emit = defineEmits(['update:dashboardData'])
@@ -22,10 +21,7 @@ const updateDashboardData = () => {
   emit('update:dashboardData', dataShadow.value)
 }
 
-const cloneLayoutAllShadow = ref([])
-const coefficient = computed(() => {
-  return (dataShadow.value.scaleRate / 100)
-})
+const coefficient = computed(() => (dataShadow.value.scaleRate / 100))
 
 const updateNode = node => {
   dataShadow.value.layout.forEach((e, i) => {
@@ -107,18 +103,19 @@ onUnmounted(() => {
   <div class="con-drag">
     <div
       class="scal-board"
-      :style="{ top: `calc(50% + ${boardOffsetY}px)`, left: `calc(50% + ${boardOffsetX}px)`, transform: `translate(-50%, -50%) scale(${coefficient}, ${coefficient})` }"
+      :style="{
+        top: `calc(50% + ${boardOffsetY}px)`,
+        left: `calc(50% + ${boardOffsetX}px)`,
+        transform: `translate(-50%, -50%) scale(${coefficient}, ${coefficient})`,
+        cursor: spaceBarFlag ? (isMouseDown ? 'grabbing' : 'grab') : '',
+        cursor: spaceBarFlag ? (isMouseDown ? '-webkit-grabbing' : '-webkit-grab') : ''
+      }"
       @wheel.prevent="handleWheel"
-    >
-      <div
-        class="scal-board-container"
-        :style="{ 'cursor': spaceBarFlag ? (isMouseDown ? 'grabbing' : 'grab') : '', 'cursor': spaceBarFlag ? (isMouseDown ? '-webkit-grabbing' : '-webkit-grab') : '' }"
-        @mousedown="dragBoardMouseDown"
-        @mousemove="dragBoardMouseMove"
-        @mouseup="dragBoardMouseUp"
-        @click.self="paintAreaClick"
+      @mousedown="dragBoardMouseDown"
+      @mousemove="dragBoardMouseMove"
+      @mouseup="dragBoardMouseUp"
       >
-        <div class="center-boar" @click="paintAreaClick"></div>
+      <div class="center-boar" @click="paintAreaClick">
         <PainterDragNode
           v-for="(node, index) in dataShadow.layout"
           :key="index"
@@ -143,39 +140,14 @@ onUnmounted(() => {
   height: 4000px;
   position: absolute;
   background: url('../../../assets//icons/layoutIcons/bgDot.svg');
-  .scal-board-container {
-    width: 6000px;
-    height: 4000px;
-    position: relative;
-    .inner-item:hover {
-      // border: 2px solid #006fff !important;
-      box-shadow: 0 0 10px #006fff !important;
-    }
-    .checked {
-      // border: 1px solid rgba(0, 111, 255, 1) !important;
-      box-shadow: 0 0 5px #006fff !important;
-    }
-    .reset-item-none {
-      pointer-events: none;
-      box-shadow: 0 0 5px #006fff !important;
-    }
-    .reset-item-class {
-      border: 1px solid transparent;
-      position: absolute;
-    }
-    .reset-item-class-text {
-      border: 0px solid transparent;
-      position: absolute;
-    }
+  .center-boar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1920px;
+    height: 1080px;
+    background-color: rgba(0, 0, 0, 0.5);
   }
-}
-.center-boar {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 1920px;
-  height: 1080px;
-  background-color: rgba(0, 0, 0, 0.5);
 }
 </style>

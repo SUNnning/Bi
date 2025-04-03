@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRefs } from 'vue';
+import { ref, toRefs, computed } from 'vue';
 const props = defineProps({
   layerIndex: {
     type: Number,
@@ -28,6 +28,10 @@ const props = defineProps({
   }
 })
 const { layerIndex, scaleRatio, title, id, canvas } = toRefs(props)
+const scale = computed(() => scaleRatio.value / 100)
+const resizing = () => {}
+const dragging = () => {}
+const dragstop = () => {}
 </script>
 
 <template>
@@ -38,25 +42,19 @@ const { layerIndex, scaleRatio, title, id, canvas } = toRefs(props)
     :w="canvas.w"
     :h="canvas.h"
     :z="1000 - layerIndex"
-    :scaleRatio="scalRatio"
-    :parent="true"
+    :scale="scale"
+    :parent="false"
     :preventActiveBehavior="true"
     :resizable="true"
     :disableUserSelect="true"
-    :draggable="!spaceBarFlag"
-    @activated="() => clickedEv(index, item)"
+    :draggable="true"
+    @activated="() => clickedEv(id)"
     @resizing="resizing"
-    @resizestop="(x, y, width, height) => onRresizeStop(x, y, width, height, item)" 
-    @dragging="(x, y) => dragging(x, y, item)"
-    @dragstop="(x, y) => dragstop(x, y, item)"
+    @resizestop="(x, y, width, height) => onRresizeStop(x, y, width, height, id)" 
+    @dragging="(x, y) => dragging(x, y, id)"
+    @dragstop="(x, y) => dragstop(x, y, id)"
   >
-    <div
-      @click="gridItemClick(item)"
-      @dblclick="dblclickEv(index, item)"
-      @contextmenu.prevent="showContextMenu($event, item)"
-      style="height: 100%"
-      :class="item.active && !uniqueGroup ? 'checked' : (item.layer !== currentSelectLayer ? 'inner-item' : '')"
-    >
+    <div>
       test
     </div>
   </vue-draggable-resizable>
